@@ -10,6 +10,11 @@ function readCommentText() {
     return;
   }
 
+  //check if button already exists
+  if (commentDiv.querySelector('.listen-tts')) {
+    return;
+  }
+
   const listenButton = document.createElement('button');
   listenButton.textContent = '🔊';
   listenButton.style.cssText = 'margin: 10px 42% 10px 42%; padding: 5px; text-align: center; border: solid; border-radius: 5px;';
@@ -52,3 +57,24 @@ function readCommentText() {
 }
 
 readCommentText();
+
+// Add another observer to watch for changes in the #main-wrap div
+const mainWrap = document.querySelector('#main-wrap > main > div.gamebook');
+if (mainWrap) {
+  const mainWrapObserver = new MutationObserver((mutations) => {
+    // Check for changes to the .analyse__board main-board div
+    mutations.forEach((mutation) => {
+      if (mutation.target.className == 'content') {
+        // read the comment
+        // Delay the call to readCommentText by 1 second (1000 milliseconds)
+        setTimeout(() => {
+          readCommentText();
+        }, 100);
+      }
+      });
+    });
+
+  mainWrapObserver.observe(mainWrap, { childList: true, subtree: true });
+} else {
+  console.warn('main-wrap element not found');
+}
