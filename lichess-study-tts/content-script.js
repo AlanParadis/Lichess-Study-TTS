@@ -1,3 +1,19 @@
+function playTextToSpeech(commentElement) {
+  const commentText = commentElement.innerText;
+  const utterance = new SpeechSynthesisUtterance(commentText);
+
+  chrome.storage.local.get('ttsVoice', (data) => {
+    if (data.ttsVoice) {
+      const selectedVoice = speechSynthesis.getVoices().find(voice => voice.name === data.ttsVoice);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+    }
+    speechSynthesis.speak(utterance);
+  });
+}
+
+
 function readCommentText() {
   const commentDiv = document.querySelector('.analyse.variant-standard.has-players.gamebook-play .comment');
   if (!commentDiv) {
@@ -9,6 +25,15 @@ function readCommentText() {
     console.warn('Comment element not found');
     return;
   }
+
+  chrome.storage.local.get('autoRead', (data) => {
+    if (data.autoRead) {
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
+      playTextToSpeech(commentElement);
+    }
+  });
 
   //check if button already exists
   if (commentDiv.querySelector('.listen-tts')) {
@@ -22,24 +47,11 @@ function readCommentText() {
   commentDiv.appendChild(listenButton);
 
   listenButton.addEventListener('click', () => {
-    const commentText = commentElement.innerText;
-    const utterance = new SpeechSynthesisUtterance(commentText);
-
-    chrome.storage.local.get('ttsVoice', (data) => {
-      if (data.ttsVoice) {
-        const selectedVoice = speechSynthesis.getVoices().find(voice => voice.name === data.ttsVoice);
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
-      }
-	  if (speechSynthesis.speaking) {
+    if (speechSynthesis.speaking) {
         speechSynthesis.cancel();
-      }
-	  else
-	  {
-		speechSynthesis.speak(utterance);
-	  }
-    });
+        return;
+    }
+    playTextToSpeech(commentElement);
   });
 
   const observer = new MutationObserver(() => {
@@ -64,7 +76,7 @@ if (mainWrap) {
   const mainWrapObserver = new MutationObserver((mutations) => {
     // Check for changes to the .analyse__board main-board div
     mutations.forEach((mutation) => {
-      if (mutation.target.className == 'content') {
+      if (mutation.target.className == 'gamebook') {
         // read the comment
         // Delay the call to readCommentText by 1 second (1000 milliseconds)
         setTimeout(() => {
