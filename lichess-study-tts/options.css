@@ -1,0 +1,89 @@
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --switch-bg-color: #ccc;
+  --switch-bg-color-checked: #2196F3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1c1c1c;
+    --text-color: #ffffff;
+    --switch-bg-color: #444;
+    --switch-bg-color-checked: #4c8bf5;
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  margin: 16px;
+}
+
+h1, h2 {
+  margin-bottom: 8px;
+}
+
+h3, .voice-label 
+{
+	display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--switch-bg-color);
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: var(--switch-bg-color-checked);
+}
+
+input:checked + .slider:before {
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 17px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
